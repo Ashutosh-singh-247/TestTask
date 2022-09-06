@@ -10,8 +10,6 @@ import ReactFlow, {
   applyEdgeChanges,
 } from "react-flow-renderer";
 import styled from "styled-components";
-import Modal from "react-modal";
-Modal.setAppElement("#root");
 
 const ModalWrapper = styled.div`
   position: fixed;
