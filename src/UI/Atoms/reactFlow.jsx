@@ -9,91 +9,50 @@ import ReactFlow, {
   applyNodeChanges,
   applyEdgeChanges,
 } from "react-flow-renderer";
-import styled from "styled-components";
-
-const ModalWrapper = styled.div`
-  position: fixed;
-  z-index: 9999;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-`;
-const BackDropWrapper = styled.div`
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background-color: rgba(0, 0, 0, 0.5);
-`;
-
-const CardTitle = styled.h2`
-  margin: 0;
-`;
-
-const CardModal = styled.div`
-  background-color: white;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  width: 100%;
-  pointer-events: auto;
-  background-color: #fff;
-  max-width: 600px;
-  background-clip: padding-box;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  border-radius: 0.3rem;
-  outline: 0;
-`;
-
-const CardHeader = styled.div`
-  display: flex;
-  flex-shrink: 0;
-  align-items: center;
-  justify-content: space-between;
-  padding: 1rem 1rem;
-  border-bottom: 1px solid #dee2e6;
-  border-top-left-radius: calc(0.3rem - 1px);
-  border-top-right-radius: calc(0.3rem - 1px);
-`;
-
-const CardBody = styled.div`
-    position: relative;
-    flex: 1 1 auto;
-    padding: 1rem;
-`;
-
-const CardCloseButton = styled.button`
-  box-sizing: content-box;
-  width: 1em;
-  height: 1em;
-  cursor: pointer;
-  padding: 0.25em 0.25em;
-  color: #000;
-  background: transparent
-    url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16' fill='%23000'%3e%3cpath d='M.293.293a1 1 0 011.414 0L8 6.586 14.293.293a1 1 0 111.414 1.414L9.414 8l6.293 6.293a1 1 0 01-1.414 1.414L8 9.414l-6.293 6.293a1 1 0 01-1.414-1.414L6.586 8 .293 1.707a1 1 0 010-1.414z'/%3e%3c/svg%3e")
-    center/1em auto no-repeat;
-  border: 0;
-  border-radius: 0.25rem;
-  opacity: 0.5;
-`;
-
-// import { defaultNodes, defaultEdges } from "./defaultData";
+import Modal from "./Modal";
 
 const onLoad = (reactFlowInstance) => {
   reactFlowInstance.fitView();
 };
 
 const OverviewFlow = () => {
-  const [isOpen, setIsOpen] = useState(false);
+  const [isRightOpen, setIsRightOpen] = useState(false);
+  const [isLeftOpen, setIsLeftOpen] = useState(false);
+  const [uiFlowState, setUiFlowState] = useState({
+    first_selected_node: null,
+    second_selected_node: null,
+    third_selected_node: "RUN ABANDONED CHECKOUT",
+    fourth_selected_node: null,
+  });
+  console.log(
+    "🚀 ~ file: reactFlow.jsx ~ line 27 ~ OverviewFlow ~ uiFlowState",
+    uiFlowState
+  );
 
-  function toggleModal() {
-    setIsOpen(!isOpen);
+  function toggleModalRight() {
+    setIsRightOpen(!isRightOpen);
   }
+  const toggleModalRightCallback = useCallback(toggleModalRight, [isRightOpen]);
+
+  function toggleModalLeft() {
+    setUiFlowState({
+      first_selected_node: null,
+      second_selected_node: null,
+      third_selected_node: "RUN ABANDONED CHECKOUT",
+      fourth_selected_node: null,
+    });
+    setIsLeftOpen(!isLeftOpen);
+  }
+
+  const toggleModalLeftCallback = useCallback(toggleModalLeft, [isLeftOpen]);
+
+  const handleSelectChange = (e) => {
+    const { name, value } = e.target;
+    setUiFlowState((prevState) => ({
+      ...prevState,
+      [name]: value,
+    }));
+  };
 
   const defaultNodes = [
     {
@@ -103,7 +62,15 @@ const OverviewFlow = () => {
         label: (
           <>
             <strong>Start When</strong>
-            <select>
+            <select
+              value={uiFlowState.first_selected_node}
+              defaultValue={"default"}
+              onChange={handleSelectChange}
+              name="first_selected_node"
+            >
+              <option value={"default"} disabled>
+                Choose an option
+              </option>
               <option value="USER_SUBSCRIBES">USER_SUBSCRIBES</option>
               <option value="USER_ORDERED">USER_ORDERED</option>
             </select>
@@ -119,9 +86,17 @@ const OverviewFlow = () => {
           <>
             <strong>IF</strong>
             <br />
-            <select>
-              <option value="WHEN_ORDERS">USER_ORDERS</option>
-              <option value="NO_ORDERS">USER_ABANDONS_CX</option>
+            <select
+              value={uiFlowState.second_selected_node}
+              defaultValue={"default"}
+              onChange={handleSelectChange}
+              name="second_selected_node"
+            >
+              <option value={"default"} disabled>
+                Choose an option
+              </option>
+              <option value="USER_ORDERS">USER_ORDERS</option>
+              <option value="USER_ABANDONS_CX">USER_ABANDONS_CX</option>
               <option value="ORDER_COMPLETED">ORDER_COMPLETED</option>
             </select>
           </>
@@ -138,8 +113,10 @@ const OverviewFlow = () => {
             <br />
             <input
               type="text"
-              value="RUN ABANDONED CHECKOUT"
               style={{ width: "100%" }}
+              value={uiFlowState.third_selected_node}
+              onChange={handleSelectChange}
+              name="third_selected_node"
             />
           </>
         ),
@@ -160,7 +137,15 @@ const OverviewFlow = () => {
           <>
             <strong>THEN</strong>
             <br />
-            <select>
+            <select
+              value={uiFlowState.fourth_selected_node}
+              defaultValue={"default"}
+              onChange={handleSelectChange}
+              name="fourth_selected_node"
+            >
+              <option value={"default"} disabled>
+                Choose an option
+              </option>
               <option value="TAG_USER">TAG_USER</option>
               <option value="SEND_SMS">SEND_SMS</option>
               <option value="SEND_FLOW">SEND_FLOW</option>
@@ -175,7 +160,7 @@ const OverviewFlow = () => {
       data: {
         label: (
           <>
-            <p onClick={toggleModal}>
+            <p onClick={toggleModalRightCallback}>
               <strong>END</strong>
             </p>
           </>
@@ -188,7 +173,7 @@ const OverviewFlow = () => {
       data: {
         label: (
           <>
-            <p onClick={toggleModal}>
+            <p onClick={toggleModalLeftCallback}>
               <strong>END</strong>
             </p>
           </>
@@ -262,22 +247,24 @@ const OverviewFlow = () => {
 
   return (
     <>
-      {isOpen && (
-        <ModalWrapper>
-          <BackDropWrapper />
-          <CardModal>
-            <CardHeader>
-              <CardTitle>Action UI</CardTitle>
-              <CardCloseButton onClick={toggleModal} />
-            </CardHeader>
-            <CardBody>
-              <div>
-                <h3>Send Flow</h3>
-                <p>Send a flow to the user</p>
-              </div>
-            </CardBody>
-          </CardModal>
-        </ModalWrapper>
+      {isRightOpen && (
+        <Modal
+          cardTitle="Action UI Right"
+          closeFunction={toggleModalRightCallback}
+          isFromRight={true}
+          selectedValue1={uiFlowState?.first_selected_node}
+          selectedValue2={uiFlowState?.second_selected_node}
+          selectedValue3={uiFlowState?.third_selected_node}
+          selectedValue4={uiFlowState?.fourth_selected_node}
+        />
+      )}
+      {isLeftOpen && (
+        <Modal
+          cardTitle="Action UI Left"
+          closeFunction={toggleModalLeftCallback}
+          cardHeading="Custom Flow for End"
+          cardContent="We can define our flow here when user click on END.."
+        />
       )}
       <ReactFlow
         nodes={elements}
