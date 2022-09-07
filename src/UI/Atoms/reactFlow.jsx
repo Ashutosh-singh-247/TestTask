@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from "react";
+import React, { useState, useCallback, useRef } from "react";
 
 import ReactFlow, {
   addEdge,
@@ -21,13 +21,14 @@ const OverviewFlow = () => {
   const [uiFlowState, setUiFlowState] = useState({
     first_selected_node: null,
     second_selected_node: null,
-    third_selected_node: "RUN ABANDONED CHECKOUT",
+    third_selected_node: "",
     fourth_selected_node: null,
   });
-  console.log(
-    "🚀 ~ file: reactFlow.jsx ~ line 27 ~ OverviewFlow ~ uiFlowState",
-    uiFlowState
-  );
+
+  const firstSelectRef = useRef(null);
+  const secondSelectRef = useRef(null);
+  const thirdSelectRef = useRef(null);
+  const fourthSelectRef = useRef(null);
 
   function toggleModalRight() {
     setIsRightOpen(!isRightOpen);
@@ -35,6 +36,10 @@ const OverviewFlow = () => {
   const toggleModalRightCallback = useCallback(toggleModalRight, [isRightOpen]);
 
   function toggleModalLeft() {
+    firstSelectRef.current.value = "Choose an option";
+    secondSelectRef.current.value = "Choose an option";
+    thirdSelectRef.current.value = "RUN ABANDONED CHECKOUT";
+    fourthSelectRef.current.value = "Choose an option";
     setUiFlowState({
       first_selected_node: null,
       second_selected_node: null,
@@ -63,12 +68,13 @@ const OverviewFlow = () => {
           <>
             <strong>Start When</strong>
             <select
+              ref={firstSelectRef}
               value={uiFlowState.first_selected_node}
-              defaultValue={"default"}
+              defaultValue={"Choose an option"}
               onChange={handleSelectChange}
               name="first_selected_node"
             >
-              <option value={"default"} disabled>
+              <option value={"Choose an option"} disabled>
                 Choose an option
               </option>
               <option value="USER_SUBSCRIBES">USER_SUBSCRIBES</option>
@@ -87,12 +93,13 @@ const OverviewFlow = () => {
             <strong>IF</strong>
             <br />
             <select
+              ref={secondSelectRef}
               value={uiFlowState.second_selected_node}
-              defaultValue={"default"}
+              defaultValue={"Choose an option"}
               onChange={handleSelectChange}
               name="second_selected_node"
             >
-              <option value={"default"} disabled>
+              <option value={"Choose an option"} disabled>
                 Choose an option
               </option>
               <option value="USER_ORDERS">USER_ORDERS</option>
@@ -113,9 +120,15 @@ const OverviewFlow = () => {
             <br />
             <input
               type="text"
+              ref={thirdSelectRef}
               style={{ width: "100%" }}
-              value={uiFlowState.third_selected_node}
-              onChange={handleSelectChange}
+              defaultValue={"RUN ABANDONED CHECKOUT"}
+              onChange={(e) => {
+                setUiFlowState((prevState) => ({
+                  ...prevState,
+                  third_selected_node: e.target.value,
+                }));
+              }}
               name="third_selected_node"
             />
           </>
@@ -138,12 +151,13 @@ const OverviewFlow = () => {
             <strong>THEN</strong>
             <br />
             <select
+              ref={fourthSelectRef}
               value={uiFlowState.fourth_selected_node}
-              defaultValue={"default"}
+              defaultValue={"Choose an option"}
               onChange={handleSelectChange}
               name="fourth_selected_node"
             >
-              <option value={"default"} disabled>
+              <option value={"Choose an option"} disabled>
                 Choose an option
               </option>
               <option value="TAG_USER">TAG_USER</option>
